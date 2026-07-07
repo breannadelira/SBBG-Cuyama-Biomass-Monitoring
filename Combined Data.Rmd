@@ -168,14 +168,32 @@ mort_treatment <- cuyama_data %>%
             survival_pct = 100 * mean(mort_status,na.rm = TRUE))
 
 
-# group by irrigation and sum biomass
+# group by species and sum biomass
+
+biomass_species <- cuyama_data %>% 
+  group_by(species_id) %>% 
+  summarise(biomass_sum = sum(biomass_kg_m2))
 
 
+# group by species and sum mortality
 
+species_mortality <- cuyama_data %>% 
+  group_by(species_id) %>% 
+  summarise(total_plants = n(),
+            plants_alive = sum(mort_status, na.rm = TRUE),
+            survival_pct=100 * mean(mort_status,na.rm = TRUE))
 
-# group by irrigation and sum mortality
+# group by irrigation and biomass/mortality
 
+irrigation <- cuyama_data %>% 
+  group_by(irrigation) %>% 
+  summarise(biomass_sum = sum(biomass_kg_m2))
 
+irrigation_mort <- cuyama_data %>% 
+  group_by(irrigation) %>% 
+  summarise(total_plants = n(),
+            plants_alive = sum(mort_status, na.rm = TRUE),
+            survival_pct = 100 * mean(mort_status, na.rm = TRUE))
 
 
 
