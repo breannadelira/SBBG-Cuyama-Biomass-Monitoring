@@ -51,7 +51,7 @@ str(cuyama_data$width1_cm_widest_diameter) #double checks columns are numberical
 
 #read in data for real now
 
-cuyama_data <- read.csv(here("Raw Data/CombinedBiomassData_June2026.csv")) %>% 
+cuyama_data <- read.csv(here("Raw Data/CombinedBiomassData_June2026_1.csv")) %>% 
   clean_names() %>% 
   filter(species_id !="EMPTY") %>% 
   rename (width1_cm = width1_cm_widest_diameter,#renaming
@@ -134,17 +134,16 @@ cuyama_data <- cuyama_data %>%
 
 
 cuyama_data <- cuyama_data %>% # substitute 0 for missing value
-  mutate(
-    biomass_kg_m2 = replace_na(biomass_kg_m2, 0))
+  mutate(biomass_kg_m2 = replace_na(biomass_kg_m2, 0))
+
 
 # group by site and sum biomass
-
 biomass_plot <- cuyama_data %>% 
   group_by(site) %>% 
   summarise(biomass_sum = sum(biomass_kg_m2))
 
-# group by site and sum mortality and percent
 
+# group by site and sum mortality and percent
 mort_plot <- cuyama_data %>%
   group_by(site) %>%
   summarise(
@@ -152,15 +151,14 @@ mort_plot <- cuyama_data %>%
     plants_alive = sum(mort_status, na.rm = TRUE),
     survival_pct = 100 * mean(mort_status, na.rm = TRUE))
 
-# group by treatment and sum biomass
 
+# group by treatment and sum biomass
 biomass_treatment <- cuyama_data %>% 
   group_by(treatment) %>% 
   summarise(biomass_sum = sum(biomass_kg_m2))
 
 
 # group by treatment and sum mortality 
-
 mort_treatment <- cuyama_data %>% 
   group_by(treatment) %>% 
   summarise(total_plants = n(),
@@ -169,22 +167,20 @@ mort_treatment <- cuyama_data %>%
 
 
 # group by species and sum biomass
-
 biomass_species <- cuyama_data %>% 
   group_by(species_id) %>% 
   summarise(biomass_sum = sum(biomass_kg_m2))
 
 
 # group by species and sum mortality
-
-species_mortality <- cuyama_data %>% 
+mortality_species <- cuyama_data %>% 
   group_by(species_id) %>% 
   summarise(total_plants = n(),
             plants_alive = sum(mort_status, na.rm = TRUE),
             survival_pct=100 * mean(mort_status,na.rm = TRUE))
 
-# group by irrigation and biomass/mortality
 
+# group by irrigation and biomass/mortality
 irrigation <- cuyama_data %>% 
   group_by(irrigation) %>% 
   summarise(biomass_sum = sum(biomass_kg_m2))
@@ -196,11 +192,78 @@ irrigation_mort <- cuyama_data %>%
             survival_pct = 100 * mean(mort_status, na.rm = TRUE))
 
 
+# group by site vs biomass/mortality
+biomass_mortality_plot <- cuyama_data %>% 
+  group_by(site) %>% 
+  summarise(total_plants = n(),
+            plants_alive = sum(mort_status, na.rm = TRUE),
+            survival_pct = 100 * mean(mort_status, na.rm = TRUE),
+            biomass_sum = sum(biomass_kg_m2))
+
 
 
 ```
 
 
+#choosing colors
+```{r}
+colors()  #to view colors
+head(colors(),20)   # to get view sample of names
+
+
+
+```
+
+
+
+#plotting
+```{r}
+# Species vs survival
+ggplot(data = mortality_species, aes(x = species_id, y = survival_pct)) +
+  geom_col(fill = "steelblue") +
+  theme_bw() +
+  labs(title = "Survival Across All Species Planted", 
+       x = "Species",
+       y = "Percentage Plants Alive")
+
+
+
+# Species vs biomass
+ggplot(data = biomass_species, aes(x = species_id, y = biomass_sum)) +
+  geom_col(fill = "steelblue") +
+  theme_bw() +
+  labs(title = "Total Biomass Across All Species Planted",
+       x = "Species",
+       y = "Total Biomass (kg/m2)")
+
+
+
+
+# Site vs survival
+ggplot(data = mort_plot, aes(x = site, y = survival_pct, fill = site)) +
+  geom_col() +  
+  theme_bw() +
+  scale_fill_manual(values = c("Condors Hope" = "#9CAF88", "Homegrown" = "khaki", "Riverside Ranch" = "thistle")) +
+  labs(title = "Survival Across Sites",
+       x = "Site",
+       y = "Percentage Plants Alive")
+
+
+
+# site vs biomass
+ggplot(data = biomass_plot, aes(x = site, y = biomass_sum, fill = site)) +
+  geom_col() +
+  theme_bw() +
+  scale_fill_manual(values = c("Condors Hope" = "#9CAF88", "Homegrown" = "khaki", "Riverside Ranch" = "thistle")) +
+  labs(title = "Total Biomass Across Sites",
+       x = "Site",
+       y = "Total Biomass (kg/m2)")
+
+
+```
+
+
+```
 
 
 
