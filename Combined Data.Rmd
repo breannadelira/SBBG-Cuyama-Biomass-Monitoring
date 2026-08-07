@@ -157,7 +157,9 @@ biomass_treatment <- cuyama_data %>%
   group_by(treatment) %>% 
   summarise(biomass_sum = sum(biomass_kg_m2))
 
-
+biomass_site_treatment <- cuyama_data %>% 
+  group_by(treatment, site) %>% 
+  summarise(biomass_sum = sum(biomass_kg_m2))
 # group by treatment and sum mortality 
 mort_treatment <- cuyama_data %>% 
   group_by(treatment) %>% 
@@ -201,7 +203,13 @@ biomass_mortality_plot <- cuyama_data %>%
             biomass_sum = sum(biomass_kg_m2))
 
 
-
+# group by species with both avg biomass and % alive
+species_biomass_alive <- cuyama_data %>% 
+  group_by(species_id) %>% 
+  summarise(total_plants = n(),
+            plants_alive = sum(mort_status, na.rm = TRUE),
+            survival_pct = 100 * mean(mort_status, na.rm = TRUE),
+            biomass_sum = sum(biomass_kg_m2))
 ```
 
 
@@ -258,6 +266,38 @@ ggplot(data = biomass_plot, aes(x = site, y = biomass_sum, fill = site)) +
   labs(title = "Total Biomass Across Sites",
        x = "Site",
        y = "Total Biomass (kg/m2)")
+
+
+```
+
+
+
+##plotting other ~ not as important data
+```{r}
+# biomass by treatment and site
+ggplot(biomass_site_treatment, aes(x = site,
+                                   y = biomass_sum, 
+                                   fill = treatment)) +
+  geom_col(position = "dodge")
+
+# scatterplot biomass/mortality by treatment
+ggplot(biomass_mortality_plot, aes(x = survival_pct,
+                                   y = biomass_sum)) +
+  geom_point() +
+  theme_bw() +
+  labs(x = "Plants Alive (%)",
+       y = "Total Biomass (kg/m2)")
+
+
+ggplot(species_biomass_alive, aes(x = plants_alive,
+                                  y = biomass_sum,
+                                  color = species_id)) +
+  geom_point(geom_point(size = 3, shape = 16)) +
+  theme_bw() +
+  labs(x = "Plants Alive (%)",
+       y = "Total Biomass (kg/m2)",
+       color = "Species")
+
 
 
 ```
