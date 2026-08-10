@@ -162,7 +162,7 @@ biomass_site_treatment <- cuyama_data %>%
   summarise(biomass_sum = sum(biomass_kg_m2))
 # group by treatment and sum mortality 
 mort_treatment <- cuyama_data %>% 
-  group_by(treatment) %>% 
+  group_by(site,treatment) %>% 
   summarise(total_plants = n(),
             plants_alive = sum(mort_status, na.rm = TRUE),
             survival_pct = 100 * mean(mort_status,na.rm = TRUE))
@@ -272,13 +272,49 @@ ggplot(data = biomass_plot, aes(x = site, y = biomass_sum, fill = site)) +
 
 
 
-##plotting other ~ not as important data
+##plotting other data
 ```{r}
-# biomass by treatment and site
+# biomass/mortality by treatment and site
 ggplot(biomass_site_treatment, aes(x = site,
                                    y = biomass_sum, 
                                    fill = treatment)) +
-  geom_col(position = "dodge")
+  geom_col(position = "dodge") +
+  theme_bw() +
+  labs(x = "Site",
+       y = "Total Biomass (kg/m2)",
+       title = "Total Biomass by Treatment",
+       fill = "Treatment")
+
+
+ggplot(mort_treatment, aes(x = site,
+                           y = survival_pct,
+                            fill = treatment)) +
+  geom_col(position = "dodge") +
+  theme_bw () +
+  labs(x = "Site",
+       y = "Plants Alive (%)",
+       title = "Total Plants Alive by Treatment",
+       fill = "Treatment")
+
+# biomass/mortality by irrigated plants vs not 
+ggplot(irrigation, aes(x = irrigation,
+                       y = biomass_sum)) +
+  geom_col() +
+  theme_bw() +
+  labs( x = "Irrigation Status",
+        y = "Total Biomass (kg/m2)",
+        title = "Total Biomass by Irrigation Status")
+
+
+
+ggplot(irrigation_mort, aes(x = irrigation,
+                            y = survival_pct)) +
+  geom_col() +
+  theme_bw() +
+  labs(x = "Irrigation Status",
+       y = "Plants Alive (%)",
+       title = "% Plants Alive by Irrigation Status")
+
 
 # scatterplot biomass/mortality by treatment
 ggplot(biomass_mortality_plot, aes(x = survival_pct,
@@ -302,6 +338,13 @@ ggplot(species_biomass_alive, aes(x = plants_alive,
 
 ```
 
+
+#plotting treatment 
+```{r}
+ggplot(biomass_site_treatment, )
+
+
+```
 
 ```
 
