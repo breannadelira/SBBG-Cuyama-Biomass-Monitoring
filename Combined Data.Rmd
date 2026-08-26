@@ -51,7 +51,7 @@ str(cuyama_data$width1_cm_widest_diameter) #double checks columns are numberical
 
 #read in data for real now
 
-cuyama_data <- read.csv(here("Raw Data/CombinedBiomassData_June2026_1.csv")) %>% 
+cuyama_data <- read.csv(here("Raw Data/CombinedBiomassData_June2026_2.csv")) %>% 
   clean_names() %>% 
   filter(species_id !="EMPTY") %>% 
   rename (width1_cm = width1_cm_widest_diameter,#renaming
@@ -210,6 +210,14 @@ species_biomass_alive <- cuyama_data %>%
             plants_alive = sum(mort_status, na.rm = TRUE),
             survival_pct = 100 * mean(mort_status, na.rm = TRUE),
             biomass_sum = sum(biomass_kg_m2))
+
+weedstatus <- cuyama_data %>% 
+  group_by(weed_status) %>% 
+  summarise(total_plants = n(),
+            plants_alive = sum(mort_status, na.rm = TRUE),
+            survival_pct = 100 * mean(mort_status, na.rm = TRUE),
+            biomass_sum = sum(biomass_kg_m2))
+
 ```
 
 
@@ -228,7 +236,7 @@ head(colors(),20)   # to get view sample of names
 ```{r}
 # Species vs survival
 ggplot(data = mortality_species, aes(x = species_id, y = survival_pct)) +
-  geom_col(fill = "steelblue") +
+  geom_col(fill = "#C2D6D4") +
   theme_bw() +
   labs(title = "Survival Across All Species Planted", 
        x = "Species",
@@ -238,7 +246,7 @@ ggplot(data = mortality_species, aes(x = species_id, y = survival_pct)) +
 
 # Species vs biomass
 ggplot(data = biomass_species, aes(x = species_id, y = biomass_sum)) +
-  geom_col(fill = "steelblue") +
+  geom_col(fill = "#C2D6D4") +
   theme_bw() +
   labs(title = "Total Biomass Across All Species Planted",
        x = "Species",
@@ -251,10 +259,11 @@ ggplot(data = biomass_species, aes(x = species_id, y = biomass_sum)) +
 ggplot(data = mort_plot, aes(x = site, y = survival_pct, fill = site)) +
   geom_col() +  
   theme_bw() +
-  scale_fill_manual(values = c("Condors Hope" = "#9CAF88", "Homegrown" = "khaki", "Riverside Ranch" = "thistle")) +
+  scale_fill_manual(values = c("Condors Hope" = "#254E2B", "Homegrown" = "#F2E80A", "Riverside Ranch" = "#C2D6D4")) + scale_x_discrete(labels = c("Condors Hope" = "Condor's Hope", "Homegrown" = "Cuyama Homegrown", "Riverside Ranch" = "Riverside Ranch")) +
   labs(title = "Survival Across Sites",
        x = "Site",
-       y = "Percentage Plants Alive")
+       y = "Percentage Plants Alive",
+       fill = "Site")
 
 
 
@@ -262,10 +271,12 @@ ggplot(data = mort_plot, aes(x = site, y = survival_pct, fill = site)) +
 ggplot(data = biomass_plot, aes(x = site, y = biomass_sum, fill = site)) +
   geom_col() +
   theme_bw() +
-  scale_fill_manual(values = c("Condors Hope" = "#9CAF88", "Homegrown" = "khaki", "Riverside Ranch" = "thistle")) +
+  scale_fill_manual(values = c("Condors Hope" = "#254E2B", "Homegrown" = "#F2E80A", "Riverside Ranch" = "#C2D6D4")) +
+  scale_x_discrete(labels = c("Condors Hope" = "Condor's Hope", "Homegrown" = "Cuyama Homegrown", "Riverside Ranch" = "Riverside Ranch")) +
   labs(title = "Total Biomass Across Sites",
        x = "Site",
-       y = "Total Biomass (kg/m2)")
+       y = "Total Biomass (kg/m2)",
+       fill = "Site")
 
 
 ```
@@ -280,6 +291,8 @@ ggplot(biomass_site_treatment, aes(x = site,
                                    fill = treatment)) +
   geom_col(position = "dodge") +
   theme_bw() +
+  scale_fill_manual(values = c("Planted" = "#254E2B", "Tarped" = "#F2E80A", "Mulched" = "#C2D6D4", "Sheet Mulched" = "#A7A094")) +
+  scale_x_discrete(labels = c("Condors Hope" = "Condor's Hope", "Homegrown" = "Cuyama Homegrown", "Riverside Ranch" = "Riverside Ranch")) +
   labs(x = "Site",
        y = "Total Biomass (kg/m2)",
        title = "Total Biomass by Treatment",
@@ -291,6 +304,8 @@ ggplot(mort_treatment, aes(x = site,
                             fill = treatment)) +
   geom_col(position = "dodge") +
   theme_bw () +
+  scale_fill_manual(values = c("Planted" = "#254E2B", "Tarped" = "#F2E80A", "Mulched" = "#C2D6D4", "Sheet Mulched" = "#A7A094")) +
+  scale_x_discrete(labels = c("Condors Hope" = "Condor's Hope", "Homegrown" = "Cuyama Homegrown", "Riverside Ranch" = "Riverside Ranch")) +
   labs(x = "Site",
        y = "Plants Alive (%)",
        title = "Total Plants Alive by Treatment",
@@ -298,22 +313,28 @@ ggplot(mort_treatment, aes(x = site,
 
 # biomass/mortality by irrigated plants vs not 
 ggplot(irrigation, aes(x = irrigation,
-                       y = biomass_sum)) +
+                       y = biomass_sum,
+                       fill = irrigation)) +
   geom_col() +
   theme_bw() +
+  scale_fill_manual(values = c("Irrigation" = "#254E2B", "No Irrigation" = "#F2E80A")) +
   labs( x = "Irrigation Status",
         y = "Total Biomass (kg/m2)",
-        title = "Total Biomass by Irrigation Status")
+        title = "Total Biomass by Irrigation Status",
+        fill = "Irrigation")
 
 
 
 ggplot(irrigation_mort, aes(x = irrigation,
-                            y = survival_pct)) +
+                            y = survival_pct,
+                            fill = irrigation)) +
   geom_col() +
   theme_bw() +
+  scale_fill_manual(values = c("Irrigation" = "#254E2B", "No Irrigation" = "#F2E80A")) +
   labs(x = "Irrigation Status",
        y = "Plants Alive (%)",
-       title = "% Plants Alive by Irrigation Status")
+       title = "% Plants Alive by Irrigation Status", 
+       fill = "Irrigation")
 
 
 # scatterplot biomass/mortality by treatment
