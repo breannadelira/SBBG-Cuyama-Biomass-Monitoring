@@ -43,7 +43,7 @@ In this analysis, we explore the relationship between different weed suprression
 list.files("Raw Data") #list names of files
 
 
-cuyama_data <- read.csv(here("Raw Data/CombinedBiomassData_June2026.csv")) %>%
+cuyama_data <- read.csv(here("Raw Data/CombinedBiomassData_Oct26.csv")) %>%
   clean_names()
 
 class(cuyama_data$width1_cm_widest_diameter)
@@ -51,7 +51,7 @@ str(cuyama_data$width1_cm_widest_diameter) #double checks columns are numberical
 
 #read in data for real now
 
-cuyama_data <- read.csv(here("Raw Data/CombinedBiomassData_June2026.csv")) %>% 
+cuyama_data <- read.csv(here("Raw Data/CombinedBiomassData_Oct26.csv")) %>% 
   clean_names() %>% 
   filter(species_id !="EMPTY") %>% 
   rename (width1_cm = width1_cm_widest_diameter,#renaming
@@ -117,7 +117,7 @@ class(cuyama_data$date_lbd) #checks class of new column, should be date
 class(cuyama_data$date) #checks class of original column, should be character
 
 cuyama_data <- cuyama_data %>% 
-  filter(date > "2026-05-01")#filter data to keep rows after set date; important after mupltiple rounds of data collection
+  filter(date > "2026-09-01")#filter data to keep rows after set date; important after mupltiple rounds of data collection
 
 
 ```
@@ -228,17 +228,6 @@ beefiness <- cuyama_data %>%
 ```
 
 
-#choosing colors
-```{r}
-colors()  #to view colors
-head(colors(),20)   # to get view sample of names
-
-
-
-```
-
-
-
 #plotting
 ```{r}
 # Species vs survival
@@ -273,16 +262,15 @@ ggplot(data = mortality_species, aes(x = reorder(species_id, survival_pct), y = 
                               "LONSUB" = "Southern Honeysuckle",
                               "STICER" = "Nodding Needlegrass",
                               "PENGRI" = "Large-Flowered Beardtongue",
+                              "PERARB" = "Bladderpod",
                               "CIROCC" = "Cobweb Thistle",
                               "CORFIL" = "California Aster",
-                              "STAPIN" = "Prince’s Plume")) +
+                              "STAPIN" = "Prince’s Plume",
+                              "ESCCAL" = "California Poppy")) +
   labs(title = "Survival Across All Species Planted", 
        x = "Species",
        y = "Percentage Plants Alive") +
   coord_flip()
-
-
-
 
 
 # Species vs biomass
@@ -293,8 +281,8 @@ ggplot(data = biomass_species, aes(x = reorder(species_id, biomass_sum), y = bio
        x = "Species",
        y = "Total Biomass (kg/m2)")
 
-# same but with common names and flipped
 
+# same but with common names and flipped
 ggplot(data = biomass_species, aes(x = reorder(species_id, biomass_sum), y = biomass_sum)) +
   geom_col(fill = "#254E2B") +
   theme_bw() +
@@ -318,18 +306,15 @@ ggplot(data = biomass_species, aes(x = reorder(species_id, biomass_sum), y = bio
                               "LONSUB" = "Southern Honeysuckle",
                               "STICER" = "Nodding Needlegrass",
                               "PENGRI" = "Large-Flowered Beardtongue",
+                              "PERARB" = "Bladderpod",
                               "CIROCC" = "Cobweb Thistle",
                               "CORFIL" = "California Aster",
-                              "STAPIN" = "Prince’s Plume")) +
+                              "STAPIN" = "Prince’s Plume",
+                              "ESCCAL" = "California Poppy")) +
   labs(title = "Total Biomass Across All Species Planted",
        x = "Species",
        y = "Total Biomass (kg/m2)") +
   coord_flip()
-
-
-
-
-
 
 
 # Site vs survival
@@ -341,7 +326,6 @@ ggplot(data = mort_plot, aes(x = site, y = survival_pct, fill = site)) +
        x = "Site",
        y = "Percentage Plants Alive",
        fill = "Site")
-
 
 
 
@@ -415,34 +399,11 @@ ggplot(irrigation_mort, aes(x = irrigation,
        y = "Plants Alive (%)",
        title = "% Plants Alive by Irrigation Status", 
        fill = "Irrigation")
-
-
-# scatterplot biomass/mortality by treatment
-ggplot(biomass_mortality_plot, aes(x = survival_pct,
-                                   y = biomass_sum)) +
-  geom_point() +
-  theme_bw() +
-  labs(x = "Plants Alive (%)",
-       y = "Total Biomass (kg/m2)")
-
-
-ggplot(species_biomass_alive, aes(x = plants_alive,
-                                  y = biomass_sum,
-                                  color = species_id)) +
-  geom_point(geom_point(size = 3, shape = 16)) +
-  theme_bw() +
-  labs(x = "Plants Alive (%)",
-       y = "Total Biomass (kg/m2)",
-       color = "Species")
-
-
-
 ```
 
 
 Plotting Beefiness
 ```{r}
-
 ggplot(beefiness, aes(x = reorder(species_id, beefiness_var), y = beefiness_var)) +
   geom_point(color = "#254E2B") +
   theme_bw() +
@@ -465,9 +426,11 @@ ggplot(beefiness, aes(x = reorder(species_id, beefiness_var), y = beefiness_var)
                               "LONSUB" = "Southern Honeysuckle",
                               "STICER" = "Nodding Needlegrass",
                               "PENGRI" = "Large-Flowered Beardtongue",
+                              "PERARB" = "Bladderpod",
                               "CIROCC" = "Cobweb Thistle",
                               "CORFIL" = "California Aster",
-                              "STAPIN" = "Prince’s Plume")) +
+                              "STAPIN" = "Prince’s Plume",
+                              "ESCCAL" = "California Poppy")) +
   labs(title = "Species 'Beefiness'",
        x = "Species",
        y = "Beefiness (Biomass * Survival %)") +
@@ -475,10 +438,6 @@ ggplot(beefiness, aes(x = reorder(species_id, beefiness_var), y = beefiness_var)
 
 
 ```
-
-
-
-
 
 
 #### EXPERIMENTING WITH BOX PLOT CODE
@@ -523,6 +482,7 @@ ggplot(irrigation, aes(x = irrigation,
 
 ```
 
+#irrigation boxplot
 ```{r}
 irrigation_plot <- cuyama_data %>% 
   group_by(plot_id, irrigation) %>% 
