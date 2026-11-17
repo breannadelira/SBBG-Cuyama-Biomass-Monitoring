@@ -51,7 +51,7 @@ str(cuyama_data$width1_cm_widest_diameter) #double checks columns are numberical
 
 #read in data for real now
 
-cuyama_data <- read.csv(here("Raw Data/CombinedBiomassData_June2026_2.csv")) %>% 
+cuyama_data <- read.csv(here("Raw Data/CombinedBiomassData_June2026.csv")) %>% 
   clean_names() %>% 
   filter(species_id !="EMPTY") %>% 
   rename (width1_cm = width1_cm_widest_diameter,#renaming
@@ -146,11 +146,9 @@ biomass_plot <- cuyama_data %>%
 # group by site and sum mortality and percent
 mort_plot <- cuyama_data %>%
   group_by(site) %>%
-  summarise(
-    total_plants = n(),
-    plants_alive = sum(mort_status, na.rm = TRUE),
-    survival_pct = 100 * mean(mort_status, na.rm = TRUE))
-
+  summarise(total_plants = n(),
+            plants_alive = sum(mort_status, na.rm = TRUE),
+            survival_pct = 100 * mean(mort_status, na.rm = TRUE))
 
 # group by treatment and sum biomass
 biomass_treatment <- cuyama_data %>% 
@@ -218,6 +216,15 @@ weedstatus <- cuyama_data %>%
             survival_pct = 100 * mean(mort_status, na.rm = TRUE),
             biomass_sum = sum(biomass_kg_m2))
 
+
+# group by species beefiness
+beefiness <- cuyama_data %>% 
+  group_by(species_id) %>% 
+  summarise(biomass_sum = sum(biomass_kg_m2),
+            total_plants = n(),
+            plants_alive = sum(mort_status, na.rm = TRUE),
+            survival_pct = mean(mort_status, na.rm = TRUE),
+            beefiness_var = biomass_sum * survival_pct)
 ```
 
 
@@ -235,22 +242,92 @@ head(colors(),20)   # to get view sample of names
 #plotting
 ```{r}
 # Species vs survival
-ggplot(data = mortality_species, aes(x = species_id, y = survival_pct)) +
-  geom_col(fill = "#C2D6D4") +
+ggplot(data = mortality_species, aes(x = reorder(species_id, survival_pct), y = survival_pct)) +
+  geom_col(fill = "#254E2B") +
   theme_bw() +
   labs(title = "Survival Across All Species Planted", 
        x = "Species",
        y = "Percentage Plants Alive")
 
+# same but with common names and flipped
+ggplot(data = mortality_species, aes(x = reorder(species_id, survival_pct), y = survival_pct)) +
+  geom_col(fill = "#254E2B") +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 9)) +
+  scale_x_discrete(labels = c("SALMEL" = "Black Sage",
+                              "ASCERO" = "Desert Milkweed",
+                              "LEPSQU" = "Scale Broom",
+                              "ASCFAS" = "Narrowleaf Milkweed",
+                              "DATWRI" = "Sacred Datura",
+                              "EPICAN" = "California Fuchsia",
+                              "ENCFAR" = "Brittlebush",
+                              "ERILIN" = "Interior Goldenbush",
+                              "SALAPI" = "White Sage",
+                              "ISOACR" = "Alkali Goldenbush",
+                              "SENFLA" = "Threadleaf Ragwort",
+                              "SALLEU" = "Black Sage",
+                              "ERIFAS" = "California Buckwheat",
+                              "HESWHI" = "Chapparal Yucca",
+                              "OENELA" = "Tall Evening Primrose",
+                              "ATRCAN" = "Fourwing Saltbush",
+                              "LONSUB" = "Southern Honeysuckle",
+                              "STICER" = "Nodding Needlegrass",
+                              "PENGRI" = "Large-Flowered Beardtongue",
+                              "CIROCC" = "Cobweb Thistle",
+                              "CORFIL" = "California Aster",
+                              "STAPIN" = "Prince’s Plume")) +
+  labs(title = "Survival Across All Species Planted", 
+       x = "Species",
+       y = "Percentage Plants Alive") +
+  coord_flip()
+
+
+
 
 
 # Species vs biomass
-ggplot(data = biomass_species, aes(x = species_id, y = biomass_sum)) +
-  geom_col(fill = "#C2D6D4") +
+ggplot(data = biomass_species, aes(x = reorder(species_id, biomass_sum), y = biomass_sum)) +
+  geom_col(fill = "#254E2B") +
   theme_bw() +
   labs(title = "Total Biomass Across All Species Planted",
        x = "Species",
        y = "Total Biomass (kg/m2)")
+
+# same but with common names and flipped
+
+ggplot(data = biomass_species, aes(x = reorder(species_id, biomass_sum), y = biomass_sum)) +
+  geom_col(fill = "#254E2B") +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 9)) +
+  scale_x_discrete(labels = c("SALMEL" = "Black Sage",
+                              "ASCERO" = "Desert Milkweed",
+                              "LEPSQU" = "Scale Broom",
+                              "ASCFAS" = "Narrowleaf Milkweed",
+                              "DATWRI" = "Sacred Datura",
+                              "EPICAN" = "California Fuchsia",
+                              "ENCFAR" = "Brittlebush",
+                              "ERILIN" = "Interior Goldenbush",
+                              "SALAPI" = "White Sage",
+                              "ISOACR" = "Alkali Goldenbush",
+                              "SENFLA" = "Threadleaf Ragwort",
+                              "SALLEU" = "Black Sage",
+                              "ERIFAS" = "California Buckwheat",
+                              "HESWHI" = "Chapparal Yucca",
+                              "OENELA" = "Tall Evening Primrose",
+                              "ATRCAN" = "Fourwing Saltbush",
+                              "LONSUB" = "Southern Honeysuckle",
+                              "STICER" = "Nodding Needlegrass",
+                              "PENGRI" = "Large-Flowered Beardtongue",
+                              "CIROCC" = "Cobweb Thistle",
+                              "CORFIL" = "California Aster",
+                              "STAPIN" = "Prince’s Plume")) +
+  labs(title = "Total Biomass Across All Species Planted",
+       x = "Species",
+       y = "Total Biomass (kg/m2)") +
+  coord_flip()
+
+
+
 
 
 
@@ -264,6 +341,7 @@ ggplot(data = mort_plot, aes(x = site, y = survival_pct, fill = site)) +
        x = "Site",
        y = "Percentage Plants Alive",
        fill = "Site")
+
 
 
 
@@ -318,6 +396,7 @@ ggplot(irrigation, aes(x = irrigation,
   geom_col() +
   theme_bw() +
   scale_fill_manual(values = c("Irrigation" = "#254E2B", "No Irrigation" = "#F2E80A")) +
+  scale_x_discrete(labels = c("Irrigation" = "Watered", "No Irrigation" = "Not Watered")) +
   labs( x = "Irrigation Status",
         y = "Total Biomass (kg/m2)",
         title = "Total Biomass by Irrigation Status",
@@ -331,6 +410,7 @@ ggplot(irrigation_mort, aes(x = irrigation,
   geom_col() +
   theme_bw() +
   scale_fill_manual(values = c("Irrigation" = "#254E2B", "No Irrigation" = "#F2E80A")) +
+  scale_x_discrete(labels = c("Irrigation" = "Watered", "No Irrigation" = "Not Watered")) +
   labs(x = "Irrigation Status",
        y = "Plants Alive (%)",
        title = "% Plants Alive by Irrigation Status", 
@@ -360,9 +440,108 @@ ggplot(species_biomass_alive, aes(x = plants_alive,
 ```
 
 
-#plotting treatment 
+Plotting Beefiness
 ```{r}
-ggplot(biomass_site_treatment, )
+
+ggplot(beefiness, aes(x = reorder(species_id, beefiness_var), y = beefiness_var)) +
+  geom_point(color = "#254E2B") +
+  theme_bw() +
+  scale_x_discrete(labels = c("SALMEL" = "Black Sage",
+                              "ASCERO" = "Desert Milkweed",
+                              "LEPSQU" = "Scale Broom",
+                              "ASCFAS" = "Narrowleaf Milkweed",
+                              "DATWRI" = "Sacred Datura",
+                              "EPICAN" = "California Fuchsia",
+                              "ENCFAR" = "Brittlebush",
+                              "ERILIN" = "Interior Goldenbush",
+                              "SALAPI" = "White Sage",
+                              "ISOACR" = "Alkali Goldenbush",
+                              "SENFLA" = "Threadleaf Ragwort",
+                              "SALLEU" = "Black Sage",
+                              "ERIFAS" = "California Buckwheat",
+                              "HESWHI" = "Chapparal Yucca",
+                              "OENELA" = "Tall Evening Primrose",
+                              "ATRCAN" = "Fourwing Saltbush",
+                              "LONSUB" = "Southern Honeysuckle",
+                              "STICER" = "Nodding Needlegrass",
+                              "PENGRI" = "Large-Flowered Beardtongue",
+                              "CIROCC" = "Cobweb Thistle",
+                              "CORFIL" = "California Aster",
+                              "STAPIN" = "Prince’s Plume")) +
+  labs(title = "Species 'Beefiness'",
+       x = "Species",
+       y = "Beefiness (Biomass * Survival %)") +
+  coord_flip()
+
+
+```
+
+
+
+
+
+
+#### EXPERIMENTING WITH BOX PLOT CODE
+
+```{r}
+irrigation_mort <- cuyama_data %>% 
+  group_by(irrigation) %>% 
+  summarise(total_plants = n(),
+            plants_alive = sum(mort_status, na.rm = TRUE),
+            survival_pct = 100 * mean(mort_status, na.rm = TRUE))
+
+ggplot(irrigation_mort, aes(x = irrigation,
+                            y = survival_pct,
+                            fill = irrigation)) +
+  geom_col() +
+  theme_bw() +
+  scale_fill_manual(values = c("Irrigation" = "#254E2B", "No Irrigation" = "#F2E80A")) +
+  scale_x_discrete(labels = c("Irrigation" = "Watered", "No Irrigation" = "Not Watered")) +
+  labs(x = "Irrigation Status",
+       y = "Plants Alive (%)",
+       title = "% Plants Alive by Irrigation Status", 
+       fill = "Irrigation")
+#####
+
+irrigation <- cuyama_data %>% 
+  group_by(irrigation) %>% 
+  summarise(biomass_sum = sum(biomass_kg_m2))
+
+ggplot(irrigation, aes(x = irrigation,
+                       y = biomass_sum,
+                       fill = irrigation)) +
+  geom_col() +
+  theme_bw() +
+  scale_fill_manual(values = c("Irrigation" = "#254E2B", "No Irrigation" = "#F2E80A")) +
+  scale_x_discrete(labels = c("Irrigation" = "Watered", "No Irrigation" = "Not Watered")) +
+  labs( x = "Irrigation Status",
+        y = "Total Biomass (kg/m2)",
+        title = "Total Biomass by Irrigation Status",
+        fill = "Irrigation")
+
+
+
+```
+
+```{r}
+irrigation_plot <- cuyama_data %>% 
+  group_by(plot_id, irrigation) %>% 
+  summarise(biomass_sum = sum(biomass_kg_m2, na.rm = TRUE),
+    .groups = "drop")
+
+
+ggplot(irrigation_plot,
+       aes(x = irrigation,
+           y = biomass_sum,
+           fill = irrigation)) +
+  geom_boxplot() +
+  theme_bw() +
+  scale_fill_manual(values = c("Irrigation" = "#254E2B", "No Irrigation" = "#F2E80A")) +
+  scale_x_discrete(labels = c("Irrigation" = "Watered", "No Irrigation" = "Not Watered")) +
+  labs(x = "Irrigation Status",
+       y = "Total Biomass (kg/m²)",
+       title = "Total Biomass by Irrigation Status",
+       fill = "Irrigation")
 
 
 ```
