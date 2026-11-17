@@ -1,0 +1,63 @@
+---
+title: "Cuyama Over Time"
+author: "breanna"
+date: "2026-11-17"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+    highlight: monochrome
+    toc: yes
+    toc_depth: 5
+    toc_float: yes
+    collapsed: yes
+    smooth_scroll: yes
+    number_sections: no
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+# read in packages
+library(janitor) #helps clean data, idk if it does anything else
+library(tidyverse) #helps clean and manipulate data
+library(here) #helps read in data 
+library(dplyr) #helps with data analysis
+library(stargazer) #helps make pretty tables to show data in knitted html or to save as png
+library(lubridate) #helps R recognize dates
+library(kableExtra)
+```
+
+#Introduction
+
+This code aims to synthesize and visualize data collected on Biomass (kg/m2) and Mortality of plants in our NRCS Cuyama Valley Project. The Santa Barbara Botanic Garden, in partnership with Quail Springs, is tranforming 3 different farm sites into productive better-functioning habitat. 
+
+In this analysis, we explore the relationship between different weed suprression and irrigation treatments, plant mortality, and plant growth OVER TIME.
+
+
+#read data in
+```{r}
+cuyama_data <- read.csv(here("Raw Data/CombinedBiomassData_Oct26.csv")) %>% 
+  clean_names() %>% 
+  filter(species_id != "EMPTY") %>% 
+  rename(width1_cm = width1_cm_widest_diameter, # changing column names to be less annoying
+         width2_cm = width2_cm_perpendicular_to_w1_measurement) %>% 
+  mutate(width1_m = width1_cm/100,  #making a width column in meters instead of cm
+         width2_m = width2_cm/100,
+         height2_m = height_cm) %>% 
+  mutate(mort_status = case_when(mortality_status == "A" ~ 1,
+                                 mortality_status == "D" ~ 0)
+```
+
+
+
+
+
+
+
+
+
